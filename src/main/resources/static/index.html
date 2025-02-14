@@ -1,0 +1,251 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>WebSocket demo</title>
+    <link crossorigin="anonymous" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" rel="stylesheet">
+    <script src="https://code.jquery.com/jquery-3.1.1.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@stomp/stompjs@7.0.0/bundles/stomp.umd.min.js"></script>
+    <script src="/app.js"></script>
+    <link crossorigin="anonymous" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" rel="stylesheet">
+</head>
+<body>
+<noscript><h2 style="color: #ff0000">Seems your browser doesn't support Javascript! Websocket relies on Javascript being
+    enabled. Please enable
+    Javascript and reload this page!</h2></noscript>
+<div class="container-fluid" id="main-content">
+    <div class="container-fluid" id="connection">
+        <p class="lead">
+        <h1>Connection</h1></p>
+        <form class="form-inline">
+            <div class="row">
+                <div class="col-2">
+                    <label for="url">WebSocket host URL:</label>
+                </div>
+                <div class="col-10">
+                    <input class="form-control-lg" id="url" type="url" value="localhost:8080">
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-2">
+                </div>
+                <div class="col-10">
+                    <button class="btn btn-outline-success" id="connect" type="submit">Connect</button>
+                    <button class="btn btn-outline-danger" disabled="disabled" id="disconnect" type="submit">Disconnect</button>
+                </div>
+            </div>
+        </form>
+    </div>
+    <div class="container-fluid" id="getData">
+        <div class="row">
+            <div class="col-3">
+                <p class="lead">
+                <h1>Data</h1></p>
+                <form class="form-inline">
+                    <div class="col-11">
+                        <label for="url">Get cases:</label>
+                        <table class="table table-striped" id="casesTable">
+                            <thead>
+                            <tr>
+                                <th>Cases</th>
+                            </tr>
+                            </thead>
+                            <tbody id="cases">
+                            </tbody>
+                        </table>
+                    </div>
+                    <div class="col-11">
+                        <button class="btn btn-outline-success" id="get_cases" type="submit">get cases</button>
+                        <button class="btn btn-outline-success" id="subscribe_cases" type="submit">Subscribe</button>
+                        <button class="btn btn-outline-danger" disabled="disabled" id="unsubscribe_cases" type="submit">Unsubscribe</button>
+                    </div>
+                </form>
+            </div>
+            <div class="col-4">
+                <p class="lead">
+                <h1>REST calls</h1></p>
+                <form class="form-inline">
+                    <div class="row">
+                        <div class="col-2">
+                            <label for="caseNumber_rest">Case number:</label>
+                        </div>
+                        <div class="col-10">
+                            <input class="form-control-lg" id="caseNumber_rest" type="text" value="2022.02.01.001">
+                        </div>
+                        <div class="col-2">
+                            <label for="sin_rest">Sin:</label>
+                        </div>
+                        <div class="col-10">
+                            <input class="form-control-lg" id="sin_rest" type="text" value="AABB1234NL">
+                        </div>
+                        <div class="col-2">
+                            <label for="status_rest">Status:</label>
+                        </div>
+                        <div class="col-10">
+                            <input class="form-control-lg" id="status_rest" type="text" value="ACTIVE">
+                        </div>
+                        <div class="col-2">
+                            <label for="user_rest">Username:</label>
+                        </div>
+                        <div class="col-10">
+                            <input class="form-control-lg" id="user_rest" type="text" value="DNAxs">
+                        </div>
+                        <div class="col-2">
+                        </div>
+                        <div class="col-10">
+                            <button class="btn btn-outline-success" id="send_post" type="submit">Create</button>
+                            <button class="btn btn-outline-primary" id="send_update" type="submit">Update</button>
+                            <button class="btn btn-outline-danger" id="send_remove" type="submit">Delete</button>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+    <hr>
+    <div class="container-fluid" id="subscriptions">
+        <p class="lead">
+        <h1>Subscriptions</h1>
+        <form class="form-inline">
+            <div class="row">
+                <div class="col-2">
+                    <label for="subscribe_users">Subscribe to new users:</label>
+                </div>
+                <div class="col-10">
+                    <button class="btn btn-outline-success" id="subscribe_users" type="submit">Subscribe</button>
+                    <button class="btn btn-outline-danger" disabled="disabled" id="unsubscribe_users" type="submit">Unsubscribe</button>
+                </div>
+            </div>
+        </form>
+        <div class="row ">
+            <div class="col-6">
+                <form class="form-inline">
+                    <div class="row">
+                        <div class="col-4">
+                            <label for="subscribe_messages">Subscribe to new messages:</label>
+                        </div>
+                        <div class="col-8">
+                            <button class="btn btn-outline-success" id="subscribe_messages" type="submit">Subscribe</button>
+                            <button class="btn btn-outline-danger" disabled="disabled" id="unsubscribe_messages" type="submit">Unsubscribe</button>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+        <div class="row ">
+            <div class="col-6">
+                <form class="form-inline">
+                    <div class="row">
+                        <div class="col-4">
+                            <label for="caseNumber_get">Get case data by subscribing to it:</label>
+                        </div>
+                        <div class="col-8">
+                            <input class="form-control-lg" id="caseNumber_get" type="text" value="2022.02.01.001">
+                        </div>
+                        <div class="col-4">
+                        </div>
+                        <div class="col-8">
+                            <button class="btn btn-outline-success" id="subscribe_case_get" type="submit">Subscribe</button>
+                            <button class="btn btn-outline-danger" disabled="disabled" id="unsubscribe_case_get" type="submit">Unsubscribe</button>
+                        </div>
+                    </div>
+                </form>
+            </div>
+            <div class="col-6">
+                <form class="form-inline">
+                    <div class="row">
+                        <div class="col-4">
+                            <label for="caseNumber">Subscribe to case (ie 2020.01.01.001):</label>
+                        </div>
+                        <div class="col-8">
+                            <input class="form-control-lg" id="caseNumber" type="text" value="2022.02.01.001">
+                        </div>
+                        <div class="col-4">
+                        </div>
+                        <div class="col-8">
+                            <button class="btn btn-outline-success" id="subscribe_case" type="submit">Subscribe</button>
+                            <button class="btn btn-outline-danger" disabled="disabled" id="unsubscribe_case" type="submit">Unsubscribe</button>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+    <div class="container-fluid" id="messages">
+        <p class="lead">
+        <h1>Messages</h1>
+        <div class="row ">
+            <div class="col-6">
+                <form class="form-inline">
+                    <div class="row">
+                        <div class="col-4">
+                            <label for="name">What is your name?</label>
+                        </div>
+                        <div class="col-8">
+                            <input class="form-control-lg" id="name" placeholder="Your name here..." type="text">
+                        </div>
+                        <div class="col-4">
+                        </div>
+                        <div class="col-8">
+                            <button class="btn btn-outline-secondary" id="save_username" type="submit">Save</button>
+                        </div>
+                    </div>
+                </form>
+                <form class="form-inline">
+                    <div class="row">
+                        <div class="col-4">
+                            <label for="message">What is your message?</label>
+                        </div>
+                        <div class="col-8">
+                            <input class="form-control-lg" id="message" placeholder="Your message here..." type="text">
+                        </div>
+                        <div class="col-4">
+                        </div>
+                        <div class="col-8">
+                            <button class="btn btn-outline-secondary" id="send_message" type="submit">Send</button>
+                        </div>
+                    </div>
+                </form>
+            </div>
+            <div class="col-6">
+                <form class="form-inline">
+                    <div class="row">
+                        <div class="col-4">
+                            <label for="case_number">For which case is your message?</label>
+                        </div>
+                        <div class="col-8">
+                            <input class="form-control-lg" id="case_number" placeholder="Your case number here..." type="text">
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-4">
+                            <label for="message_case">What is your message?</label>
+                        </div>
+                        <div class="col-8">
+                            <input class="form-control-lg" id="message_case" placeholder="Your message here..." type="text">
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-4">
+                        </div>
+                        <div class="col-8">
+                            <button class="btn btn-outline-secondary" id="send_message_case" type="submit">Send</button>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+    <div class="col-12">
+        <table class="table table-striped" id="conversation">
+            <thead>
+            <tr>
+                <th>Messages</th>
+            </tr>
+            </thead>
+            <tbody id="greetings">
+            </tbody>
+        </table>
+    </div>
+</div>
+</body>
+</html>

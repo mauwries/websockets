@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                   xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+                   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.6.xsd">
+
+    <changeSet author="NFI (generated)" id="initial-db-setup">
+        <createTable tableName="forensic_case">
+            <column name="id" type="BIGINT" autoIncrement="true">
+                <constraints primaryKey="true"/>
+            </column>
+            <column name="forensic_case_number" type="VARCHAR(50)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="sin" type="VARCHAR(25)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="status" type="VARCHAR(50)"/>
+            <column name="username" type="VARCHAR(255)">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+
+        <addUniqueConstraint tableName="forensic_case"
+                             columnNames="forensic_case_number"
+                             constraintName="unq_forensic_case_number"
+                             validate="true"/>
+    </changeSet>
+</databaseChangeLog>
